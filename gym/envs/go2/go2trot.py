@@ -48,6 +48,12 @@ class Go2Trot(LeggedRobot):
             dtype=torch.float,
             device=self.device,
         )
+        self.height_command = torch.full(
+            (self.num_envs, 1),
+            0.30,
+            dtype=torch.float,
+            device=self.device,
+        )
         self._update_phase_observation()
         self._update_gait_reference()
 
@@ -89,6 +95,10 @@ class Go2Trot(LeggedRobot):
 
     def _resample_commands(self, command_mask):
         super()._resample_commands(command_mask)
+
+        new_heights = torch.empty_like(self.height_command).uniform_(0.20, 0.40)
+
+        self.height_command[command_mask] = new_heights[command_mask]
 
         forward_commands = torch.tensor(
             self.command_ranges["lin_vel_x"], device=self.device
@@ -205,6 +215,10 @@ class Go2Trot(LeggedRobot):
         error /= self.scales["base_height"]
         error = torch.clamp(error, max=0, min=None).flatten()
         return self._sqrdexp(error)
+
+    def _reward_tracking_height(self):
+        error = self.base_height - self.height_command
+        return torch.exp(-torch.square(error[:, 0]) / 0.01)
 
     def _reward_tracking_lin_vel(self):
         """Tracking of linear velocity commands (xy axes)"""

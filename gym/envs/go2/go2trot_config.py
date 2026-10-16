@@ -99,6 +99,7 @@ class Go2TrotCfg(Go2Cfg):
         # Canonical RobotLayout order is FL, FR, RL, RR, with
         # hip, thigh, calf inside each leg. Backends map native order to it.
         base_height = 0.3
+        height_command = 0.3
         dof_pos = 4 * [1.0472, 2.53075, 0.94247]
         dof_pos_obs = dof_pos
         # Residual radians per policy unit, independent of observation ranges.
@@ -115,6 +116,7 @@ class Go2TrotRunnerCfg(Go2RunnerCfg):
             "base_ang_vel",
             "projected_gravity",
             "commands",
+            "height_command",
             "dof_pos_obs",
             "dof_vel",
             "dof_pos_target",
@@ -147,6 +149,7 @@ class Go2TrotRunnerCfg(Go2RunnerCfg):
             "base_ang_vel",
             "projected_gravity",
             "commands",
+            "height_command",
             "dof_pos_obs",
             "dof_vel",
             "dof_pos_target",
@@ -168,7 +171,8 @@ class Go2TrotRunnerCfg(Go2RunnerCfg):
                 dof_pos_limits = 0.0
                 feet_contact_forces = 0.0
                 dof_near_home = 0.0
-                min_base_height = 0.5
+                min_base_height = 0.0
+                tracking_height = 3.0
                 action_rate = 0.1
                 action_rate2 = 0.05
                 trot_support = 3.0
