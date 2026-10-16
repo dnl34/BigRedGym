@@ -97,7 +97,6 @@ class Go2Trot(LeggedRobot):
         super()._resample_commands(command_mask)
 
         new_heights = torch.empty_like(self.height_command).uniform_(0.20, 0.40)
-
         self.height_command[command_mask] = new_heights[command_mask]
 
         forward_commands = torch.tensor(
