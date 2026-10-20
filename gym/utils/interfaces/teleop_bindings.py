@@ -84,7 +84,7 @@ class TeleopCommands:
         self.increment_height = 0.02
 
         env.commands[:] = 0.0
-        env.commands[:, 0] = 1.0  # seed forward velocity so motion is visible
+        # env.commands[:, 0] = 1.0  # seed forward velocity so motion is visible
         if hasattr(env.cfg, "commands"):
             env.cfg.commands.resampling_time = env.max_episode_length_s + 1
 
@@ -110,11 +110,15 @@ class TeleopCommands:
                 self.env.height_command + self.increment_height,
                 max=self.max_height,
             )
+            print("Height command:", self.env.height_command[0].item())
+
         elif action == "down":
             self.env.height_command[:] = torch.clamp(
                 self.env.height_command - self.increment_height,
                 min=self.min_height,
             )
+            print("Height command:", self.env.height_command[0].item())
+
         elif action == "reset":
             self.env.timed_out[:] = True
             self.env.reset()

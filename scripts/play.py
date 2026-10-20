@@ -124,6 +124,8 @@ def setup(args):
         headless=args.headless,
         backend=args.backend,
     )
+    if hasattr(env, "commands"):
+        env.commands[:] = 0.0
 
     runner = task_registry.make_alg_runner(env, train_cfg)
     runner.switch_to_eval()
@@ -131,15 +133,39 @@ def setup(args):
 
 
 def play(env, runner):
+    import csv
+
     n_steps = 10 * int(env.max_episode_length)
-    for _ in range(n_steps):
-        runner.set_actions(
-            runner.actor_cfg["actions"],
-            runner.get_inference_actions(),
-            runner.actor_cfg["disable_actions"],
-        )
-        env.step()
-        env.check_exit()
+
+    with open("height_tracking.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["time_s", "commanded_height_m", "actual_height_m"])
+
+        for step in range(n_steps):
+            runner.set_actions(
+                runner.actor_cfg["actions"],
+                runner.get_inference_actions(),
+                runner.actor_cfg["disable_actions"],
+            )
+
+            env.step()
+
+            writer.writerow([
+                step * env.dt,
+                env.height_command[0, 0].item(),
+                env.base_height[0, 0].item(),
+            ])
+
+            env.check_exit()
+    # n_steps = 10 * int(env.max_episode_length)
+    # for _ in range(n_steps):
+    #     runner.set_actions(
+    #         runner.actor_cfg["actions"],
+    #         runner.get_inference_actions(),
+    #         runner.actor_cfg["disable_actions"],
+    #     )
+    #     env.step()
+    #     env.check_exit()
 
 
 if __name__ == "__main__":
